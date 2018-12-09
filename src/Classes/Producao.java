@@ -41,8 +41,8 @@ public class Producao {
     public String toString() {
         return "\n          Producao{" +
                 "nome=" + nome +
-                ", geraVazio=" + geraVazio +
-                ", regras=" + regras +
+                " geraVazio=" + geraVazio +
+                " regras=" + regras +
                 "\n}\n";
     }
 }

@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        test();
+        provaMalopes();
         //System.out.println(etapa3().toString());
     }
 
@@ -161,6 +161,64 @@ public class Main {
         producoes.add(new Producao('A', regrasA, false));
         producoes.add(new Producao('B', regrasB, false));
         producoes.add(new Producao('C', regrasC, true));
+
+        Variavel start = variaveis.get(0);
+
+        Gramatica gramatica = new Gramatica(variaveis, terminais, producoes, start);
+
+        SimplificacaoGLC simplificacaoGLC = new SimplificacaoGLC(gramatica);
+        Gramatica novaGramatica = simplificacaoGLC.etapa1();
+        novaGramatica = simplificacaoGLC.etapa2();
+        novaGramatica = simplificacaoGLC.etapa3();
+        System.out.println(novaGramatica);
+    }
+
+    public static void provaMalopes() throws Exception {
+
+        List<Terminal> terminais = new ArrayList<Terminal>();
+        terminais.add(new Terminal("a"));
+        terminais.add(new Terminal("b"));
+        terminais.add(new Terminal("c"));
+        terminais.add(new Terminal("d"));
+
+        List<Variavel> variaveis = new ArrayList<Variavel>();
+        variaveis.add(new Variavel('S'));
+        variaveis.add(new Variavel('A'));
+        variaveis.add(new Variavel('B'));
+        variaveis.add(new Variavel('C'));
+        variaveis.add(new Variavel('D'));
+
+        List<ProducaoRegra> regrasS = new ArrayList<ProducaoRegra>();
+        regrasS.add(new ProducaoRegra("AB"));
+        regrasS.add(new ProducaoRegra("A"));
+        regrasS.add(new ProducaoRegra("CAa"));
+
+        List<ProducaoRegra> regrasA = new ArrayList<ProducaoRegra>();
+        regrasA.add(new ProducaoRegra("a"));
+        regrasA.add(new ProducaoRegra("b"));
+
+        List<ProducaoRegra> regrasB = new ArrayList<ProducaoRegra>();
+        regrasB.add(new ProducaoRegra("BC"));
+        regrasB.add(new ProducaoRegra("AB"));
+        regrasB.add(new ProducaoRegra("bb"));
+        regrasB.add(new ProducaoRegra("&"));
+
+        List<ProducaoRegra> regrasC = new ArrayList<ProducaoRegra>();
+        regrasC.add(new ProducaoRegra("cC"));
+        regrasC.add(new ProducaoRegra("aC"));
+
+        List<ProducaoRegra> regrasD = new ArrayList<ProducaoRegra>();
+        regrasD.add(new ProducaoRegra("dD"));
+        regrasD.add(new ProducaoRegra("d"));
+        regrasD.add(new ProducaoRegra("c"));
+
+
+        List<Producao> producoes = new ArrayList<Producao>();
+        producoes.add(new Producao('S', regrasS, false));
+        producoes.add(new Producao('A', regrasA, false));
+        producoes.add(new Producao('B', regrasB, false));
+        producoes.add(new Producao('C', regrasC, false));
+        producoes.add(new Producao('D', regrasD, false));
 
         Variavel start = variaveis.get(0);
 

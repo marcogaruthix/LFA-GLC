@@ -92,7 +92,10 @@ public class SimplificacaoGLC {
                 //List<ProducaoRegra> novasRegras = GramaticaUtils.getVariavelPeloNome(pRegra.getDerivacao().charAt(0), this.gramatica).getRegras();
                 List<ProducaoRegra> novasRegras = GramaticaUtils.extrairRegrasDaProducaoInutil( GramaticaUtils.getVariavelPeloNome(pRegra.getDerivacao().charAt(0), this.gramatica), this.gramatica );
                 this.gramatica.getProducoes().get(i).getRegras().remove(pRegra);
-                this.gramatica.getProducoes().get(i).getRegras().addAll(novasRegras);
+                for(ProducaoRegra r : novasRegras){
+                    if(!this.gramatica.getProducoes().get(i).getRegras().contains(r))
+                        this.gramatica.getProducoes().get(i).getRegras().add(r);
+                }
             }
             i++;
         }
@@ -102,10 +105,11 @@ public class SimplificacaoGLC {
     }
 
     // Exclusão de Variaveis Inuteis (Nao geram palavras)
-    public Gramatica etapa3(){
+    public Gramatica etapa3() throws Exception {
 
         // IDENTIFICANDO VARIAVEIS INUTEIS (NAO GERAM NENHUM TERMINAL DIRETAMENTE)
         List<Variavel> novasVariaveis = new ArrayList<Variavel>();
+        List<Variavel> variaveisExcluidas = new ArrayList<Variavel>();
         int i = 0;
         for (Producao p : this.gramatica.getProducoes()){
 
@@ -117,15 +121,18 @@ public class SimplificacaoGLC {
 
             regrasLoop:
             {
+                if( GramaticaUtils.producaoDerivaProducao( this.gramatica.getProducoes().get(0), p, this.gramatica) )
                 for (ProducaoRegra pRegra : regras) {
 
-                    // Qualquer simbolo exceto UpperCase
-                    if (Pattern.compile("[^A-Z]").matcher(pRegra.getDerivacao()).matches() && pRegra.getDerivacao().length() > 0) {
-                        novasVariaveis.add(new Variavel(p.getNome()));
-                        break regrasLoop;
-                    }
+                        // Qualquer simbolo exceto UpperCase
+                        if (Pattern.compile("[^A-Z]").matcher(pRegra.getDerivacao()).matches() && pRegra.getDerivacao().length() > 0) {
+                            novasVariaveis.add(new Variavel(p.getNome()));
+                            break regrasLoop;
+                        }
 
                 }
+
+                variaveisExcluidas.add(new Variavel(p.getNome()));
             }
             i++;
         }
@@ -137,21 +144,34 @@ public class SimplificacaoGLC {
         List<Producao> novasProducoes = new ArrayList<Producao>();
         List<Producao> gramaticaProducoes = new ArrayList<Producao>();
         gramaticaProducoes.addAll(this.gramatica.getProducoes());
-        for(Producao p : gramaticaProducoes)
-            for(Variavel v : novasVariaveis)
-                if(p.getNome() == v.getNome()) {
+        for(Producao p : gramaticaProducoes) {
+
+
+            for (Variavel v : novasVariaveis)
+                if (p.getNome() == v.getNome()) {
                     novasProducoes.add(p);
 
                     // SETANDO NOVOS TERMINAIS
-                    for (ProducaoRegra regra : p.getRegras()){
+                    List<ProducaoRegra> pRegras = new ArrayList<>(p.getRegras().size());
+                    pRegras.addAll(p.getRegras());
+                    regrasLoop:
+                    for (ProducaoRegra regra : pRegras) {
+
+                        for(Variavel vExcluida : variaveisExcluidas) {
+                            if(regra.getDerivacao().contains(Character.toString(vExcluida.getNome()))) {
+                                p.getRegras().remove(regra);
+                                continue regrasLoop;
+                            }
+                        }
+
                         List<Terminal> pTerminais = GramaticaUtils.extrairTerminaisDaProducaoRegra(regra);
-                        for (Terminal t : pTerminais){
-                            if(!GramaticaUtils.gramaticaPossuiTerminal(this.gramatica, t))
+                        for (Terminal t : pTerminais) {
+                            if (!GramaticaUtils.gramaticaPossuiTerminal(this.gramatica, t))
                                 this.gramatica.getTerminais().add(t);
                         }
                     }
-
                 }
+        }
         this.gramatica.setProducoes(novasProducoes);
 
         return this.gramatica;

@@ -36,6 +36,33 @@ public class GramaticaUtils {
         return false;
     }
 
+    public static boolean producaoDerivaProducao(Producao p, Producao pAlvo, Gramatica gramatica) throws Exception {
+
+        if(pAlvo == gramatica.getProducoes().get(0))
+            return true;
+
+        for (ProducaoRegra pRegra : p.getRegras()){
+
+
+            if( existeProducaoNaRegra(pRegra) ) {
+
+                if(pRegra.getDerivacao().contains(Character.toString(pAlvo.getNome())))
+                    return true;
+
+                for (Producao pLinha : getVariaveisByProducaoRegra(pRegra, gramatica)) {
+
+                    if (p != pLinha && producaoDerivaProducao(pLinha, pAlvo, gramatica))
+                        return true;
+
+                }
+
+            }
+
+        }
+
+        return false;
+    }
+
     public static List<Producao> getVariaveisByProducaoRegra(ProducaoRegra regra, Gramatica gramatica) throws Exception {
 
         //if( regra.getTipo() == ProducaoRegraEnum.t || regra.getTipo() == ProducaoRegraEnum.tt )
@@ -74,7 +101,7 @@ public class GramaticaUtils {
     }
 
     public static boolean existeProducaoNaRegra(ProducaoRegra regra){
-        Pattern pattern = Pattern.compile("[A-Z]");
+        Pattern pattern = Pattern.compile("[A-Z]+[A-Z]*");
         if( pattern.matcher(regra.getDerivacao()).matches() )
             return true;
         return false;

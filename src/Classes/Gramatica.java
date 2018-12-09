@@ -52,9 +52,9 @@ public class Gramatica {
     public String toString() {
         return "\nGramatica{" +
                 "\n     variaveis=" + variaveis +
-                "\n,    terminais=" + terminais +
-                "\n,    producoes=" + producoes +
-                "\n,    start=" + start +
+                "\n\n     terminais=" + terminais +
+                "\n\n     producoes=" + producoes +
+                "\n\n     start=" + start +
                 "\n}";
     }
 }
